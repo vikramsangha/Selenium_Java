@@ -57,6 +57,10 @@ public class TestBase {
 	        options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR,org.openqa.selenium.UnexpectedAlertBehaviour.ACCEPT);
 	        options.addArguments("disable-popup-blocking");       
 	        options.addArguments("--disable-backgrounding-occluded-windows");
+	        
+	        if(prop.getProperty("headless").contains("true"))
+	        	options.addArguments("--headless");
+	        
 	        driver = new ChromeDriver(options); 
 		}
 		else {
