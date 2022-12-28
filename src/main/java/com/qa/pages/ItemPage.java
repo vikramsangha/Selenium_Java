@@ -43,10 +43,13 @@ public class ItemPage extends TestBase {
 		return aboutItem.isDisplayed();
 	}
 	
-	public void getaboutItemText() {
+	public String getaboutItemText() {
+		String text="";
 		for( WebElement element : aboutmetext){
-			System.out.println(element.getText());
+			text = text.concat(element.getText());
 		}
+		
+		return text;
 
 	}
 

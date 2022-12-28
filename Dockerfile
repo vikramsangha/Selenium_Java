@@ -29,7 +29,10 @@ RUN  mkdir -p /tmp/.X11-unix && sudo chmod 1777 /tmp/.X11-unix \
 # Copy framework in image and clean target folders
 COPY . .
 RUN rm -rf target/* \
-&& rm -rf test-output\* 
+&& rm -rf test-output\* \
+&& chmod -R o+rwx /opt/selenium/
+
+# Maven clean
 RUN mvn clean
 
 # Set user as seluser
