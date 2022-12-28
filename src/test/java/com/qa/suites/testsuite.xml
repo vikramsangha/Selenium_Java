@@ -5,7 +5,6 @@
 	<test name="Amazon Test">
 		<classes>
 			<class name="com.qa.tests.TestClass"></class>
-
 		</classes>
 	</test>
 </suite>

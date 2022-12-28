@@ -3,6 +3,8 @@ package com.qa.base;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -14,6 +16,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qa.utils.TestUtil;
 
@@ -24,14 +27,22 @@ public class TestBase {
 	public static WebDriver driver;
 	public static Properties prop;
 	public static WebDriverManager webDriverManagerObject = null;
+	private static String OS = System.getProperty("os.name").toLowerCase();
 	
 	public TestBase() {
 		
 		try {
 			prop = new Properties();
+			if(OS.contains("win")) {
 			FileInputStream ip = new FileInputStream(System.getProperty("user.dir")+ "/src/main/java/com"
 					+ "/qa/config/config.properties");
 			prop.load(ip);
+			} else {
+			FileInputStream ip = new FileInputStream("./src/main/java/com"
+						+ "/qa/config/config.properties");
+			prop.load(ip);
+			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -45,23 +56,37 @@ public class TestBase {
 		
 		if(browserName.equals("chrome")){
 			
-			webDriverManagerObject = WebDriverManager.chromedriver();
-			webDriverManagerObject.cachePath(System.getProperty("user.dir")+ "/src/main/java/com");
-			webDriverManagerObject.setup();
-			
 			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 	        chromePrefs.put("profile.default_content_settings.popups", 0);
 	        chromePrefs.put("safebrowsing.enabled", "true"); 
 	        ChromeOptions options = new ChromeOptions();
+	       // options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 	        options.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
 	        options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR,org.openqa.selenium.UnexpectedAlertBehaviour.ACCEPT);
 	        options.addArguments("disable-popup-blocking");       
 	        options.addArguments("--disable-backgrounding-occluded-windows");
+	        options.addArguments("--no-sandbox");
 	        
 	        if(prop.getProperty("headless").contains("true"))
 	        	options.addArguments("--headless");
 	        
-	        driver = new ChromeDriver(options); 
+			
+			if(!prop.getProperty("remote_execution").contains("true")) {
+			webDriverManagerObject = WebDriverManager.chromedriver();
+			if(OS.contains("win")) {
+				webDriverManagerObject.cachePath(System.getProperty("user.dir")+ "/src/main/java/com");
+				webDriverManagerObject.setup();
+			} 
+			
+	        driver = new ChromeDriver(options);
+			} else {
+				try {
+					driver = new RemoteWebDriver(new URL(prop.getProperty("remote_selenium_url")), options);
+				} catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		else {
 			System.out.println("please pass the right browser name......"); 
