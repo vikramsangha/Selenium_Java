@@ -8,7 +8,9 @@ import java.util.Set;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -23,8 +25,8 @@ public class ItemPage extends TestBase {
 	@FindBy(xpath="//h1[contains(text(),'About this item')]")
 	WebElement aboutItem;
 	
-	@FindBy(id="//div[@id='feature-bullets']//span")
-	List<WebElement> elements;
+	@FindAll({@FindBy(xpath = "//div[@id='feature-bullets']//span[@class='a-list-item']")})
+	List<WebElement> aboutmetext;
 	
 	@FindBy(id="nav-logo-sprites")
 	WebElement logo;
@@ -41,15 +43,11 @@ public class ItemPage extends TestBase {
 		return aboutItem.isDisplayed();
 	}
 	
-	public String getaboutItemText() {
-		String text="";
-		
-		for( WebElement element : elements){
-			text=text.concat(element.getText());
+	public void getaboutItemText() {
+		for( WebElement element : aboutmetext){
+			System.out.println(element.getText());
 		}
-		
-		//System.out.println(text);
-		return text;
+
 	}
 
 

@@ -39,7 +39,7 @@ public class TestClass extends TestBase {
 		ip = tv.clickSecondHighestPricedItem();
 		
 		Assert.assertTrue(ip.aboutItemPresent());
-		System.out.println(ip.getaboutItemText());
+		ip.getaboutItemText();
 		
 	}
 		
