@@ -14,63 +14,64 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qa.base.TestBase;
+import com.qa.utils.TestUtil;
 
 public class TelevisionsPage extends TestBase {
-	
-	WebDriverWait wait = new WebDriverWait(driver , Duration.ofSeconds(30));
 
-	@FindBy(xpath="//a[span[contains(text(),'Samsung')]]/div/label/input")
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+	TestUtil utils = new TestUtil();
+
+	@FindBy(xpath = "//a[span[contains(text(),'Samsung')]]/div/label/i")
 	WebElement samsungBrand;
-	
-	@FindBy(id="//span[span[@class='a-button-text a-declarative']]/i")
+
+	@FindBy(id = "//span[span[@class='a-button-text a-declarative']]/i")
 	WebElement sortByFilter;
-	
-	@FindBy(xpath="//a[contains(text(),'Price: Low to High')]")
+
+	@FindBy(xpath = "//a[contains(text(),'Price: Low to High')]")
 	WebElement priceHighToLow;
-	
-	@FindBy(xpath="//div[@data-index='2']//a[span[contains(text(),'Samsung')]]")
+
+	@FindBy(xpath = "//div[@data-index='2']//a[span[contains(text(),'Samsung')]]")
 	WebElement secondHighestItem;
-	
-	public TelevisionsPage(){
+
+	@FindBy(xpath = "//span[contains(text(),'RESULTS')]")
+	WebElement results;
+
+	@FindBy(id = "s-result-sort-select")
+	WebElement selectFilter;
+
+	public TelevisionsPage() {
 		PageFactory.initElements(driver, this);
 	}
-	
+
 	public void selectSamsungBrand() {
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[span[contains(text(),'Samsung')]]/div/label/i")));
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", samsungBrand);
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[span[contains(text(),'Samsung')]]/div/label/i"))).click();
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(text(),'RESULTS')]")));
-		
+		utils.scrollToViewAndClickAndWait(samsungBrand, results);
 	}
-	
+
 	public void selectHighToLowOption() {
-		Select select = new Select(driver.findElement(By.id("s-result-sort-select")));
-		select.selectByVisibleText("Price: High to Low");
+		utils.selectDropDownAndOption(selectFilter, "Price: High to Low");
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[contains(text(),'RESULTS')]")));
 	}
-	
+
 	public ItemPage clickSecondHighestPricedItem() {
-		secondHighestItem.click();
-		
+		utils.click(secondHighestItem);
+
 		String parent = driver.getWindowHandle();
 		Set<String> windowHandles = driver.getWindowHandles();
-		
-		Iterator<String> I1= windowHandles.iterator();
-		
-		while(I1.hasNext())
-		{
-			String child_window=I1.next();
 
-			if(!parent.equals(child_window))
-			{
+		Iterator<String> I1 = windowHandles.iterator();
+
+		while (I1.hasNext()) {
+			String child_window = I1.next();
+
+			if (!parent.equals(child_window)) {
 				driver.switchTo().window(child_window);
 			}
 
 		}
-		
+
+		utils.waitForJSandJQueryToLoad(Duration.ofSeconds(TestUtil.PAGE_LOAD_TIMEOUT));
 		return new ItemPage();
-		
+
 	}
-	
-	
+
 }

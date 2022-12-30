@@ -6,12 +6,15 @@ FROM selenium/standalone-chrome:$version as builder
 
 # Working directory as /opt/selenium
 WORKDIR /opt/selenium
+
+COPY . .
+
 USER root
 
 # Install required tools
 RUN apt-get update -qqy \
 && apt-get -qqy install maven ffmpeg \ 
-&& rm -rf /var/lib/apt/lists/* /var/cache/apt/*
+&& rm -rf /var/lib/apt/lists/* /var/cache/apt/* 
 
 #============================
 # Set configuration options browser launch
@@ -27,7 +30,7 @@ RUN  mkdir -p /tmp/.X11-unix && sudo chmod 1777 /tmp/.X11-unix \
 && sed -i -e '/^assistive_technologies=/s/^/#/' /etc/java-*-openjdk/accessibility.properties
 
 # Copy framework in image and clean target folders
-COPY . .
+#COPY . .
 RUN rm -rf target/* \
 && rm -rf test-output\* \
 && chmod -R o+rwx /opt/selenium/

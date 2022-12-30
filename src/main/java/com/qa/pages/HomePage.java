@@ -10,51 +10,52 @@ import com.qa.base.TestBase;
 import com.qa.utils.TestUtil;
 
 public class HomePage extends TestBase {
-	
-	@FindBy(id="nav-logo-sprites")
+
+	TestUtil utils = new TestUtil();
+
+	@FindBy(id = "nav-logo-sprites")
 	WebElement logo;
-	
-	@FindBy(id="nav-hamburger-menu")
+
+	@FindBy(id = "nav-hamburger-menu")
 	WebElement hamburgerMenu;
-	
-	@FindBy(xpath="//a[div[contains(text(),'TV, Appliances')]]")
+
+	@FindBy(id = "hmenu-content")
+	WebElement menuContent;
+
+	@FindBy(xpath = "//a[div[contains(text(),'TV, Appliances')]]")
 	WebElement electronicsMenu;
-	
-	@FindBy(xpath="//a[contains(text(),'Televisions')]")
+
+	@FindBy(xpath = "//a[contains(text(),'Televisions')]")
 	WebElement television;
-	
-	public HomePage(){
+
+	public HomePage() {
 		PageFactory.initElements(driver, this);
 	}
-	
-	//Actions:
-	public String validatePageTitle(){
+
+	// Actions:
+	public String validatePageTitle() {
 		return driver.getTitle();
 	}
-		
-	public boolean validatehamburgerMenu(){
-		return hamburgerMenu.isDisplayed();
+
+	public boolean validatehamburgerMenu() {
+		return utils.waitForElementToBeDisplayed(hamburgerMenu, Duration.ofSeconds(TestUtil.PAGE_LOAD_TIMEOUT));
 	}
-	
-	public void clickhamburgerMenu() throws Exception{
-		hamburgerMenu.click();
-		TestUtil.waitForJSandJQueryToLoad(Duration.ofSeconds(10));
-		
+
+	public void clickhamburgerMenu() {
+		utils.clickAndWait(hamburgerMenu, menuContent);
 	}
-	
-	//a[div[contains(text(),'TV, Appliances')]]
-	
-	public void clickTVAppliancesAndElectronics(){
-		electronicsMenu.click();
-		
+
+	public void clickTVAppliancesAndElectronics() {
+		utils.scrollToViewAndClickAndWait(electronicsMenu, television);
 	}
-	
-	public boolean validateLogo(){
-		return logo.isDisplayed();
+
+	public boolean validateLogo() {
+		return utils.waitForElementToBeDisplayed(logo, Duration.ofSeconds(TestUtil.PAGE_LOAD_TIMEOUT));
 	}
-	
+
 	public TelevisionsPage clickOnTelevision() {
-		television.click();
+		utils.click(television);
+		utils.waitForJSandJQueryToLoad(Duration.ofSeconds(TestUtil.PAGE_LOAD_TIMEOUT));
 		return new TelevisionsPage();
 	}
 

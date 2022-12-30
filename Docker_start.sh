@@ -24,18 +24,21 @@ if [ ! -z "${record_execution}" ]; then
 	nohup /opt/bin/start-xvfb.sh &
 	sleep 10
 	mkdir -p /opt/selenium/video
-	nohup ffmpeg -y -f x11grab -video_size 1360x1020 -r 30 -i ${DISPLAY} -codec:v libx264 -preset ultrafast -pix_fmt yuv420p /opt/selenium/video/abc.mp4 &
+	nohup ffmpeg -y -f x11grab -video_size 1360x1020 -r 30 -i ${DISPLAY} -codec:v libx264 -preset ultrafast -pix_fmt yuv420p /opt/selenium/reports/$test.mp4 &
 	sleep 5
 fi
 
 cat ./src/main/java/com/qa/config/config.properties
 
-sleep 20
-	
 
 # Run Tests
 
 mvn test --no-transfer-progress -Dtest=${test}
+
+if [ $? -ne 0 ]; then 
+	echo " ${test} failed "
+	exit 1
+fi
 
 # Stop recording
 if [ ! -z "${record_execution}" ]; then
@@ -43,7 +46,4 @@ if [ ! -z "${record_execution}" ]; then
 	kill -s QUIT $(pidof ffmpeg)
 fi
 
-# Analyze Results
-
-
-# Save Artifacts
+exit 0

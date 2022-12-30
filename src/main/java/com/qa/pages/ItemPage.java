@@ -17,42 +17,40 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.qa.base.TestBase;
+import com.qa.utils.TestUtil;
 
 public class ItemPage extends TestBase {
-	
-	WebDriverWait wait = new WebDriverWait(driver , Duration.ofSeconds(20));
 
-	@FindBy(xpath="//h1[contains(text(),'About this item')]")
+	WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+	TestUtil utils = new TestUtil();
+
+	@FindBy(xpath = "//h1[contains(text(),'About this item')]")
 	WebElement aboutItem;
-	
-	@FindAll({@FindBy(xpath = "//div[@id='feature-bullets']//span[@class='a-list-item']")})
+
+	@FindAll({ @FindBy(xpath = "//div[@id='feature-bullets']//span[@class='a-list-item']") })
 	List<WebElement> aboutmetext;
-	
-	@FindBy(id="nav-logo-sprites")
+
+	@FindBy(id = "nav-logo-sprites")
 	WebElement logo;
-	
-	
-	
-	public ItemPage(){
+
+	public ItemPage() {
 		PageFactory.initElements(driver, this);
 	}
-	
+
 	public Boolean aboutItemPresent() {
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-logo-sprites")));
 		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", aboutItem);
-		return aboutItem.isDisplayed();
+		return utils.waitForElementToBeDisplayed(aboutItem, Duration.ofSeconds(TestUtil.PAGE_LOAD_TIMEOUT));
 	}
-	
+
 	public String getaboutItemText() {
-		String text="";
-		for( WebElement element : aboutmetext){
+		String text = "";
+		for (WebElement element : aboutmetext) {
 			text = text.concat(element.getText());
 		}
-		
+
 		return text;
 
 	}
 
-
-	
 }
