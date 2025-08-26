@@ -21,13 +21,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.qa.utils.TestUtil;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class TestBase {
 
 	public static WebDriver driver;
 	public static Properties prop;
-	public static WebDriverManager webDriverManagerObject = null;
+	//public static WebDriverManager webDriverManagerObject = null;
 	private static String OS = System.getProperty("os.name").toLowerCase();
 	public static Logger log = Logger.getLogger(TestBase.class.getName());
 
@@ -75,11 +74,11 @@ public class TestBase {
 			}
 
 			if (!prop.getProperty("remote_execution").contains("true")) {
-				webDriverManagerObject = WebDriverManager.chromedriver();
+				/*webDriverManagerObject = WebDriverManager.chromedriver();
 				if (OS.contains("win")) {
 					webDriverManagerObject.cachePath(System.getProperty("user.dir") + "/src/main/java/com");
 					webDriverManagerObject.setup();
-				}
+				}*/
 
 				driver = new ChromeDriver(options);
 			} else {

@@ -1,49 +1,29 @@
 #!/bin/bash
+set -euo pipefail
 
-# Start Selenium server for remote execution
-echo "Starting the selenium server for remote execution"
-cd /opt/bin
-nohup ./start-selenium-standalone.sh &
-cd /opt/selenium
+# --- Configure your framework properties for remote + headless ---
+CONF=./src/main/java/com/qa/config/config.properties
+sed -i 's/^remote_execution.*/remote_execution=true/' "$CONF"
+sed -i 's#^remote_selenium_url.*#remote_selenium_url=http://127.0.0.1:4444/wd/hub#' "$CONF"
+sed -i 's/^headless.*/headless=true/' "$CONF"
+echo "Effective config:"
+cat "$CONF"
 
+# --- Start Selenium the official way (supervised entrypoint) ---
+echo "Starting Selenium Standalone via entry_point.sh ..."
+/opt/bin/entry_point.sh &
 
-echo "Setting remote_selenium_url and headless mode for exection"
-sed -i "s/remote_execution.*/remote_execution=true/" "./src/main/java/com/qa/config/config.properties"
+# --- Wait until the Grid is ready ---
+echo -n "Waiting for Selenium at http://127.0.0.1:4444/status"
+for i in {1..60}; do
+  if curl -fsS http://127.0.0.1:4444/status >/dev/null; then
+    echo "  OK"
+    break
+  fi
+  echo -n "."
+  sleep 1
+done
 
-if [ ! -z "${remote_selenium_url}" ]; then
-	sed -i "s/remote_selenium_url.*/remote_selenium_url=$remote_selenium_url/" "./src/main/java/com/qa/config/config.properties"
-fi
-
-if [ ! -z "${headless}" ]; then
-	sed -i "s/headless.*/headless=$headless/" "./src/main/java/com/qa/config/config.properties"
-fi
-
-if [ ! -z "${record_execution}" ]; then
-	echo "Starting XVFB for video recording and setting headleass to false irrespective of user input "
-	sed -i "s/headless.*/headless=false/" "./src/main/java/com/qa/config/config.properties"
-	nohup /opt/bin/start-xvfb.sh &
-	sleep 10
-	mkdir -p /opt/selenium/video
-	nohup ffmpeg -y -f x11grab -video_size 1360x1020 -r 30 -i ${DISPLAY} -codec:v libx264 -preset ultrafast -pix_fmt yuv420p /opt/selenium/reports/$test.mp4 &
-	sleep 5
-fi
-
-cat ./src/main/java/com/qa/config/config.properties
-
-
-# Run Tests
-
-mvn test --no-transfer-progress -Dtest=${test}
-
-if [ $? -ne 0 ]; then 
-	echo " ${test} failed "
-	exit 1
-fi
-
-# Stop recording
-if [ ! -z "${record_execution}" ]; then
-	echo $(pidof ffmpeg)
-	kill -s QUIT $(pidof ffmpeg)
-fi
-
-exit 0
+# --- Run tests (optionally filter via -e test=<Class#method>) ---
+echo "Running tests: ${test:-ALL}"
+mvn -q -Dtest="${test:-}" test --no-transfer-progress
